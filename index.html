@@ -172,21 +172,16 @@ footer{text-align:center;border-top:1px solid #5f3d17;padding:22px;color:#cdbb9e
         <div><label>▣ जन्म तिथि</label><input id="dob" type="date" required></div>
         <div><label>◷ जन्म समय</label><input id="time" type="time" required></div>
         <div class="full">
-  <label>🌍 जन्म स्थान</label>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-    <select id="country" required style="width:100%;padding:15px 16px;border-radius:11px;border:1px solid #76501f;background:#0e0718;color:#fff;font-size:16px;outline:none;">
-      <option value="">देश चुनें</option>
-    </select>
-    <select id="state" required disabled style="width:100%;padding:15px 16px;border-radius:11px;border:1px solid #76501f;background:#0e0718;color:#fff;font-size:16px;outline:none;">
-      <option value="">पहले देश चुनें</option>
-    </select>
-    <select id="city" required disabled style="width:100%;padding:15px 16px;border-radius:11px;border:1px solid #76501f;background:#0e0718;color:#fff;font-size:16px;outline:none;">
-      <option value="">पहले राज्य चुनें</option>
-    </select>
-  </div>
+<label>🌍 जन्म स्थान</label>
+<div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;">
+<input id="country" required placeholder="देश — जैसे India">
+<input id="state" required placeholder="राज्य / प्रांत — जैसे Haryana">
+<input id="city" required placeholder="शहर — जैसे Ambala">
+</div>
+<div style="margin-top:8px;color:#cdbb9e;font-size:12px;">Submit पर शहर के coordinates और उस तारीख का timezone automatically resolve होगा।</div>
 </div>
 <div>
-  <label>⚧ लिंग</label>
+<label>⚧ लिंग</label>
   <select id="gender" required style="width:100%;padding:15px 16px;border-radius:11px;border:1px solid #76501f;background:#0e0718;color:#fff;font-size:16px;outline:none;">
     <option value="">अपना लिंग चुनें</option>
     <option value="पुरुष">पुरुष</option>
@@ -309,9 +304,9 @@ document.getElementById('futureForm').addEventListener('submit', function(e){
   const name=document.getElementById('name').value.trim();
   const dob=document.getElementById('dob').value;
   const time=document.getElementById('time').value;
-  const country=document.getElementById('country').value;
-  const state=document.getElementById('state').value;
-  const city=document.getElementById('city').value;
+  const country=document.getElementById('country').value.trim();
+  const state=document.getElementById('state').value.trim();
+  const city=document.getElementById('city').value.trim();
   const gender=document.getElementById('gender').value;
 
   if(!name || !dob || !time || !country || !state || !city || !gender){

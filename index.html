@@ -94,7 +94,7 @@ nav a:hover{color:#f5bd43}
 .section-title{text-align:center;color:#f4c64f;font-size:29px;margin:0 0 30px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:23px}
 label{display:block;margin-bottom:8px;color:#f7e6c5}
-input{
+input,select{
     width:100%;padding:15px 16px;border-radius:11px;border:1px solid #76501f;
     background:#0e0718;color:#fff;font-size:16px;outline:none;
 }
@@ -106,7 +106,7 @@ input:focus,select:focus{border-color:#e7b33d;box-shadow:0 0 0 3px rgba(231,179,
     color:#3c1900;background:linear-gradient(#ffe17a,#d9931b);
     cursor:pointer;box-shadow:0 7px 25px rgba(215,145,24,.28);
 }
-.security{text-align:center;margin-top:14px;color:#d8c8ad;font-size:13px}
+.date-hint{margin-top:6px;color:#a996b7;font-size:11px}.security{text-align:center;margin-top:14px;color:#d8c8ad;font-size:13px}
 .results{display:none;margin-top:30px}
 .result-box{padding:25px;border:1px solid #7d531c;border-radius:18px;background:#10071a}
 .result-box h3{color:#f4c64f}
@@ -169,14 +169,14 @@ footer{text-align:center;border-top:1px solid #5f3d17;padding:22px;color:#cdbb9e
     <form id="futureForm">
       <div class="grid">
         <div><label>♙ आपका नाम</label><input id="name" required placeholder="अपना पूरा नाम लिखें"></div>
-        <div><label>▣ जन्म तिथि</label><input id="dob" type="date" required></div>
+        <div><label>▣ जन्म तिथि</label><input id="dob" type="text" inputmode="numeric" autocomplete="bday" required placeholder="DD/MM/YYYY" maxlength="10" pattern="\d{2}/\d{2}/\d{4}"><div class="date-hint">दिन / महीना / वर्ष — जैसे 20/08/1984</div></div>
         <div><label>◷ जन्म समय</label><input id="time" type="time" required></div>
         <div class="full">
 <label>🌍 जन्म स्थान</label>
 <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;">
-<input id="country" required placeholder="देश — जैसे India">
-<input id="state" required placeholder="राज्य / प्रांत — जैसे Haryana">
-<input id="city" required placeholder="शहर — जैसे Ambala">
+<select id="country" required></select>
+<select id="state" required></select>
+<select id="city" required></select>
 </div>
 <div style="margin-top:8px;color:#cdbb9e;font-size:12px;">Submit पर शहर के coordinates और उस तारीख का timezone automatically resolve होगा।</div>
 </div>
@@ -287,6 +287,8 @@ function fillSelect(el, items, placeholder){
   el.disabled=items.length===0;
 }
 fillSelect(countryEl,Object.keys(locationData),'देश चुनें');
+fillSelect(stateEl,[],'पहले देश चुनें');
+fillSelect(cityEl,[],'पहले राज्य / प्रांत चुनें');
 
 countryEl.addEventListener('change',()=>{
   const states=locationData[countryEl.value]||{};
@@ -302,20 +304,33 @@ document.getElementById('futureForm').addEventListener('submit', function(e){
   e.preventDefault();
 
   const name=document.getElementById('name').value.trim();
-  const dob=document.getElementById('dob').value;
+  const dobDisplay=document.getElementById('dob').value.trim();
   const time=document.getElementById('time').value;
   const country=document.getElementById('country').value.trim();
   const state=document.getElementById('state').value.trim();
   const city=document.getElementById('city').value.trim();
   const gender=document.getElementById('gender').value;
 
-  if(!name || !dob || !time || !country || !state || !city || !gender){
+  const dm=dobDisplay.match(/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/);
+  if(!dm){
+    alert('जन्म तिथि DD/MM/YYYY में भरें, जैसे 20/08/1984');
+    return;
+  }
+  const dd=Number(dm[1]), mm=Number(dm[2]), yy=Number(dm[3]);
+  const test=new Date(Date.UTC(yy,mm-1,dd));
+  if(test.getUTCFullYear()!==yy || test.getUTCMonth()!==mm-1 || test.getUTCDate()!==dd){
+    alert('कृपया सही जन्म तिथि भरें।');
+    return;
+  }
+
+  if(!name || !time || !country || !state || !city || !gender){
     alert('कृपया देश, राज्य/प्रांत, शहर और बाकी सभी जानकारी भरें।');
     return;
   }
 
+  const dob=`${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
   const place=city+', '+state+', '+country;
-  const params=new URLSearchParams({name, dob, time, place, country, state, city, gender});
+  const params=new URLSearchParams({name, dob, dobDisplay, time, place, country, state, city, gender});
   window.location.href='birth-chart.html?'+params.toString();
 });
 </script>
